@@ -85,5 +85,7 @@ function saveinstance(opt)
     print("File saved as: " .. fileName .. " (Size: " .. size .. " bytes)")
 end
 
+return saveinstance
+
 -- Example usage
 --saveinstance(StandardOptioms)
