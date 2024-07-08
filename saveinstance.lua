@@ -15,16 +15,12 @@ end
 -- Function to get the list of properties for an instance
 local function getProperties(instance)
     local properties = {}
-    local success, props = pcall(function()
-        return instance:GetChildren()
-    end)
-
-    if success then
-        for _, prop in ipairs(props) do
-            properties[prop.Name] = prop.Value
+    for _, prop in ipairs({"Name", "ClassName", "Parent", "Archivable"}) do
+        local success, value = pcall(function() return instance[prop] end)
+        if success then
+            properties[prop] = value
         end
     end
-
     return properties
 end
 
@@ -34,14 +30,11 @@ local function serializeProperties(instance)
     local props = getProperties(instance)
 
     for prop, value in pairs(props) do
-        local success, propValue = pcall(function() return instance[prop] end)
-        if success then
-            if typeof(propValue) == "Instance" then
-                propValue = propValue:GetFullName()
-            end
-            propValue = escapeXml(tostring(propValue))
-            table.insert(properties, string.format("<%s>%s</%s>", prop, propValue, prop))
+        if typeof(value) == "Instance" then
+            value = value:GetFullName()
         end
+        value = escapeXml(tostring(value))
+        table.insert(properties, string.format("<%s>%s</%s>", prop, value, prop))
     end
 
     return table.concat(properties, "\n")
@@ -128,5 +121,5 @@ function saveinstance(opt)
     print("File saved as: " .. fileName .. " (Size: " .. size .. " bytes)")
 end
 
--- Returns the function
+-- Example usage
 return saveinstance
